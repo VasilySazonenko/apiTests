@@ -6,12 +6,6 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
