@@ -2,12 +2,16 @@ package api;
 
 import static io.restassured.RestAssured.given;
 
-import io.restassured.http.ContentType;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +29,6 @@ public class AvataringRest {
                 .extract().body().jsonPath().getList("data", UserData.class);
         users.forEach(x -> assertTrue(x.getAvatar().contains(x.getId().toString())));
         assertTrue(users.stream().allMatch(x -> x.getEmail().endsWith("@reqres.in")));
-
         List<String> avatars = users.stream().map(UserData::getAvatar).collect(Collectors.toList());
         List<String> ids = users.stream().map(x -> x.getId().toString()).collect(Collectors.toList());
 
@@ -64,5 +67,29 @@ public class AvataringRest {
                 .then().log().all()
                 .extract().as(FailedReg.class);
        assertEquals(error, failedReg.getError());
+    }
+
+    @Test
+    public void checkYearList(){
+        Specification.installSpecification(Specification.requestSpec(URL), Specification.responseSpecOk200());
+List<YearList> yearList = given().
+        when().
+        get("api/unknown").
+        then().log().all().
+        extract().jsonPath().getList("data", YearList.class);
+List<Integer> years = yearList.stream().map(YearList::getYear).collect(Collectors.toList());
+List<Integer> sortedYears = years.stream().sorted().collect(Collectors.toList());
+assertEquals(sortedYears, years);
+    }
+
+    @Test
+    public void checkDelete(){
+        Specification.installSpecification(Specification.requestSpec(URL), Specification.responseSpecUnique(204));
+   given()
+           .when()
+           .delete("/api/users?page=2")
+           .then()
+           .log()
+           .all();
     }
 }
